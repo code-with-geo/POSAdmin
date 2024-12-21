@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 import {
+  AccountCircle,
   Article,
   Assessment,
   Category,
@@ -34,6 +35,24 @@ const Drawer = styled.div`
     props.isOpen ? "2px 0px 5px rgba(0, 0, 0, 0.5)" : "none"};
   transition: left 0.3s ease-in-out;
   z-index: 1000;
+
+  // Conditionally enable scrolling
+  overflow-y: ${(props) => (props.isOpen ? "auto" : "hidden")};
+  overflow-x: hidden;
+
+  // Optional scrollbar style
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #697565;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #34495e;
+  }
 `;
 
 const Overlay = styled.div`
@@ -75,7 +94,7 @@ const ToggleButton = styled.button`
 
 const DrawerItem = styled(NavLink)`
   display: flex;
-  margin: 10px 0;
+  margin: 5px 0;
   padding: 10px;
   text-decoration: none;
   font-size: 12px;
@@ -94,6 +113,11 @@ const DrawerItem = styled(NavLink)`
   }
 `;
 
+const DrawerContent = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const SideNav = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -107,55 +131,85 @@ const SideNav = () => {
       <Container>
         <Drawer isOpen={isOpen}>
           <h3>Dashboard</h3>
-          <DrawerItem
-            to="/dashboard/products"
-            onClick={toggleDrawer}
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            <Dashboard fontSize="small" /> Home
-          </DrawerItem>
-          <DrawerItem
-            to="/contact"
-            onClick={toggleDrawer}
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            <Receipt fontSize="small" /> Sales
-          </DrawerItem>
-          <DrawerItem
-            to="/contact"
-            onClick={toggleDrawer}
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            <Assessment fontSize="small" /> Reports
-          </DrawerItem>
-          <DrawerItem
-            to="/about"
-            onClick={toggleDrawer}
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            <Article fontSize="small" /> Products
-          </DrawerItem>
-          <DrawerItem
-            to="/services"
-            onClick={toggleDrawer}
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            <Category fontSize="small" /> Categories
-          </DrawerItem>
-          <DrawerItem
-            to="/contact"
-            onClick={toggleDrawer}
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            <Inventory fontSize="small" /> Inventory
-          </DrawerItem>
-          <DrawerItem
-            to="/contact"
-            onClick={toggleDrawer}
-            className={({ isActive }) => (isActive ? "active" : "")}
-          >
-            <Warehouse fontSize="small" /> Locations
-          </DrawerItem>
+          <DrawerContent>
+            <DrawerItem
+              to="/dashboard/products"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <Dashboard fontSize="small" /> Home
+            </DrawerItem>
+            <DrawerItem
+              to="/dashboard/users"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <AccountCircle fontSize="small" /> Users
+            </DrawerItem>
+            <DrawerItem
+              to="/contact"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <Receipt fontSize="small" /> Sales
+            </DrawerItem>
+            <DrawerItem
+              to="/contact"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <Assessment fontSize="small" /> Reports
+            </DrawerItem>
+            <DrawerItem
+              to="/dashboard/products"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <Article fontSize="small" /> Products
+            </DrawerItem>
+            <DrawerItem
+              to="/dashboard/category"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <Category fontSize="small" /> Categories
+            </DrawerItem>
+            <DrawerItem
+              to="/dashboard/inventory"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <Inventory fontSize="small" /> Inventory
+            </DrawerItem>
+            <DrawerItem
+              to="/dashboard/locations"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <Warehouse fontSize="small" /> Locations
+            </DrawerItem>
+            <DrawerItem
+              to="/dashboard/suppliers"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <Warehouse fontSize="small" /> Supplier
+            </DrawerItem>
+            <DrawerItem
+              to="/dashboard/discounts"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <Warehouse fontSize="small" /> Discount
+            </DrawerItem>
+            <DrawerItem
+              to="/dashboard/cash-drawer"
+              onClick={toggleDrawer}
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
+              <Warehouse fontSize="small" /> Cash Drawer
+            </DrawerItem>
+          </DrawerContent>
         </Drawer>
         <Content isOpen={isOpen}>
           <ToggleButton isOpen={isOpen} onClick={toggleDrawer}>

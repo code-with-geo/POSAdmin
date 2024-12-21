@@ -27,79 +27,11 @@ const TableColumns = [
     resizable: false,
   },
   {
-    field: "Description",
-    headerName: "Description",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "WholesalePrice",
-    headerName: "Wholesale Price",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "RetailPrice",
-    headerName: "Retail Price",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "SupplierPrice",
-    headerName: "Supplier Price",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "ReorderLevel",
-    headerName: "Reorder Level",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "IsVat",
-    headerName: "Vat",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "Status",
-    headerName: "Status",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-    valueGetter: (params) => {
-      if (params === 1) {
-        return "Enable"; // Display "Enable" when Status = 1
-      }
-      return "Disable"; // Display "Disable" otherwise
-    },
-  },
-  {
     field: "DateCreated",
     headerName: "Date Created",
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
-  },
-  {
-    field: "Category", // New field for Category.Name
-    headerName: "Category Name",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-    valueGetter: (params) => {
-      if (!params?.Name) {
-        return "N/A"; // Default value if Category is not available
-      }
-      return params.Name;
-    },
   },
   {
     field: "actions",
@@ -114,7 +46,7 @@ const TableColumns = [
 
 const DataTable = () => {
   const [products, setProducts] = useState([]);
-  const [connection, setConnection] = useState(null);
+  /* const [connection, setConnection] = useState(null);
 
   console.log(products);
   const token =
@@ -166,7 +98,7 @@ const DataTable = () => {
       })
       .then((response) => setProducts(response.data))
       .catch((error) => console.error("Error fetching products:", error));
-  };
+  };*/
 
   return (
     <>

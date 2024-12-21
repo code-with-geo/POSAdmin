@@ -5,8 +5,10 @@
   "dependencies": {
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
+    "@microsoft/signalr": "^8.0.7",
     "@mui/icons-material": "^6.1.10",
     "@mui/material": "^6.1.10",
+    "@mui/x-data-grid": "^7.23.3",
     "axios": "^1.7.9",
     "cra-template": "1.2.0",
     "react": "^19.0.0",
@@ -15,6 +17,7 @@
     "react-router-dom": "^7.0.2",
     "react-scripts": "5.0.1",
     "styled-components": "^6.1.13",
+    "sweetalert2": "^11.15.2",
     "web-vitals": "^4.2.4"
   },
   "scripts": {

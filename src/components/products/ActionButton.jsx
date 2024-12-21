@@ -3,14 +3,13 @@ import styled from "styled-components";
 import { Delete, Edit } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Axios from "axios";
+import axios from "axios";
 
 const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  background-color: #fff;
 `;
 
 const DeleteButton = styled(Delete)`
@@ -23,19 +22,19 @@ const EditButton = styled(Edit)`
   color: #868e96;
 `;
 
-function ActionButton() {
+function ActionButton({ params }) {
   const navigate = useNavigate();
+  const token =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjNiZTVjZWJjLThkNDktNGY4Yy1iODkzLTYxNjRmNTNkMjY3YyIsImV4cCI6MTczNDc4NzMzOSwiaXNzIjoiSnd0QXV0aEFwaSIsImF1ZCI6Ikp3dEF1dGhBcGlVc2VycyJ9.eGF46l67kS30y-_g8p_gLy36G-HTLf0B8eMhdr9EMo0";
 
   const _delete = (id) => {
     try {
-      Axios.post(`http://localhost:8080/announcements/remove`, {
-        announcementID: id,
-      })
+      axios
+        .put(`https://localhost:7148/api/products/remove/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
         .then((res) => {
-          if (res.data.responsecode === "402") {
-            console.log(res.data.message);
-          } else if (res.data.responsecode === "200") {
-          }
+          console.log(res);
         })
         .catch((err) => {
           if (err.response) Error();
@@ -49,10 +48,14 @@ function ActionButton() {
     <>
       <Container>
         <Tooltip title="Edit">
-          <EditButton onClick={() => navigate(`/dashboard/products/edit`)} />
+          <EditButton
+            onClick={() =>
+              navigate(`/dashboard/products/edit/${params.row.Id}`)
+            }
+          />
         </Tooltip>
         <Tooltip title="Delete">
-          <DeleteButton />
+          <DeleteButton onClick={() => _delete(params.row.Id)} />
         </Tooltip>
       </Container>
     </>

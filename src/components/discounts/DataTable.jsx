@@ -13,8 +13,8 @@ const PageContainer = styled.div`
 
 const TableColumns = [
   {
-    field: "Id",
-    headerName: "ID",
+    field: "DiscountId",
+    headerName: "Discount ID",
     flex: 1,
     resizable: false,
     headerClassName: "theme-header",
@@ -27,43 +27,8 @@ const TableColumns = [
     resizable: false,
   },
   {
-    field: "Description",
-    headerName: "Description",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "WholesalePrice",
-    headerName: "Wholesale Price",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "RetailPrice",
-    headerName: "Retail Price",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "SupplierPrice",
-    headerName: "Supplier Price",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "ReorderLevel",
-    headerName: "Reorder Level",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-  },
-  {
-    field: "IsVat",
-    headerName: "Vat",
+    field: "Percentage",
+    headerName: "Percentage",
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
@@ -89,19 +54,6 @@ const TableColumns = [
     resizable: false,
   },
   {
-    field: "Category", // New field for Category.Name
-    headerName: "Category Name",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-    valueGetter: (params) => {
-      if (!params?.Name) {
-        return "N/A"; // Default value if Category is not available
-      }
-      return params.Name;
-    },
-  },
-  {
     field: "actions",
     headerName: "Actions",
     type: "actions",
@@ -114,7 +66,7 @@ const TableColumns = [
 
 const DataTable = () => {
   const [products, setProducts] = useState([]);
-  const [connection, setConnection] = useState(null);
+  /* const [connection, setConnection] = useState(null);
 
   console.log(products);
   const token =
@@ -166,7 +118,7 @@ const DataTable = () => {
       })
       .then((response) => setProducts(response.data))
       .catch((error) => console.error("Error fetching products:", error));
-  };
+  };*/
 
   return (
     <>
