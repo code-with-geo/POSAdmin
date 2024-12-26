@@ -2,9 +2,13 @@ import { ArrowLeft, Article } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button, TextBox } from "../../components/styles/Component.styled";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
+import { useCookies } from "react-cookie";
+import { apiURL } from "../../hooks/Users";
+import { HubConnectionBuilder } from "@microsoft/signalr";
+import { ToggleMessage } from "../../libraries/SweetAlert";
 
 const Container = styled.div`
   padding: 10px;
@@ -56,6 +60,83 @@ const ComboBox = styled.select`
 
 function EditUser() {
   const navigate = useNavigate();
+
+  const [cookies, setCookies] = useCookies(["access_token"]);
+  const token = cookies.access_token;
+
+  const api = apiURL();
+  const [connection, setConnection] = useState(null);
+  const { id } = useParams();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const [users, setUsers] = useState([]);
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isRole, setIsRole] = useState();
+
+  const onChangeRole = (event) => {
+    setIsRole(event.target.value);
+  };
+
+  const _edit = (data, event) => {
+    event.preventDefault();
+    try {
+      axios
+        .put(
+          `${api}/api/auth/${id}`,
+          {
+            name,
+            username,
+            password,
+            isrole: isRole,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then((res) => {
+          console.log(res);
+          if (res.status === 204) {
+            ToggleMessage("success", "User successfully updated.");
+            navigate("/dashboard/users");
+          } else if (res.status === 402) {
+          } else {
+            ToggleMessage("error", "Please contact technical support.");
+          }
+        })
+        .catch((err) => {
+          if (err.response) Error();
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchUsers = () => {
+    axios
+      .get(`${api}/api/auth/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => setUsers(response.data))
+      .catch((error) => console.error("Error fetching users:", error));
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (users != null) {
+      setName(users.Name);
+      setUsername(users.Username);
+      setPassword(users.Password);
+      setIsRole(users.IsRole);
+    }
+  }, [users]);
+
   return (
     <>
       <Container>
@@ -73,7 +154,7 @@ function EditUser() {
             </h3>
           </Header>
           <Body>
-            <Form>
+            <Form onSubmit={handleSubmit(_edit)}>
               <List>
                 <ListItem>
                   <TextBox
@@ -84,6 +165,11 @@ function EditUser() {
                     fontSize="13px"
                     placeholder="Name"
                     required="true"
+                    {...register("Name")}
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>
@@ -95,6 +181,11 @@ function EditUser() {
                     fontSize="13px"
                     placeholder="Username"
                     required="true"
+                    {...register("Username")}
+                    value={username}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>
@@ -106,14 +197,26 @@ function EditUser() {
                     fontSize="13px"
                     placeholder="Password"
                     required="true"
+                    {...register("Password")}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>
-                  <ComboBox>
+                  <ComboBox
+                    {...register("Role", {
+                      validate: (value) => value !== "",
+                    })}
+                    value={isRole}
+                    onChange={onChangeRole}
+                  >
                     <option value="">Select a Role</option>
-                    <option value="">Administrator</option>
-                    <option value="">Cashier</option>
-                    <option value="">Staff</option>
+                    <option value="0">Administrator</option>
+                    <option value="1">Cashier</option>
+                    <option value="2">Staff</option>
+                    <option value="3">Stock Controller</option>
                   </ComboBox>
                 </ListItem>
                 <ListItem>

@@ -15,66 +15,60 @@ const PageContainer = styled.div`
 
 const TableColumns = [
   {
-    field: "Id",
-    headerName: "ID",
+    field: "DrawerId",
+    headerName: "Drawer ID",
     flex: 1,
     resizable: false,
     headerClassName: "theme-header",
   },
   {
-    field: "Name",
-    headerName: "Name",
+    field: "Cashier",
+    headerName: "Cashier",
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
   },
   {
-    field: "Description",
-    headerName: "Description",
+    field: "InitialCash",
+    headerName: "Initial Cash",
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
   },
   {
-    field: "WholesalePrice",
-    headerName: "Wholesale Price",
+    field: "TotalSales",
+    headerName: "Total Sales",
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
   },
   {
-    field: "RetailPrice",
-    headerName: "Retail Price",
+    field: "Withdrawals",
+    headerName: "Withdrawals",
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
   },
   {
-    field: "SupplierPrice",
-    headerName: "Supplier Price",
+    field: "Expense",
+    headerName: "Expense",
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
   },
   {
-    field: "ReorderLevel",
-    headerName: "Reorder Level",
+    field: "DrawerCash",
+    headerName: "Drawer Cash",
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
   },
   {
-    field: "IsVat",
-    headerName: "Vat",
+    field: "TimeStart",
+    headerName: "Time Start",
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
-    valueGetter: (params) => {
-      if (params === 1) {
-        return "Enable"; // Display "Enable" when Status = 1
-      }
-      return "Disable"; // Display "Disable" otherwise
-    },
   },
   {
     field: "Status",
@@ -97,19 +91,6 @@ const TableColumns = [
     resizable: false,
   },
   {
-    field: "Category", // New field for Category.Name
-    headerName: "Category Name",
-    flex: 1,
-    headerClassName: "theme-header",
-    resizable: false,
-    valueGetter: (params) => {
-      if (!params?.Name) {
-        return "N/A"; // Default value if Category is not available
-      }
-      return params.Name;
-    },
-  },
-  {
     field: "actions",
     headerName: "Actions",
     type: "actions",
@@ -121,24 +102,23 @@ const TableColumns = [
 ];
 
 const DataTable = () => {
-  const [products, setProducts] = useState([]);
+  const [cashDrawer, setCashDrawer] = useState([]);
   const [connection, setConnection] = useState(null);
   const [cookies, setCookies] = useCookies(["access_token"]);
   const token = cookies.access_token;
   const api = apiURL();
 
   useEffect(() => {
-    // Fetch initial product list with Authorization header
     axios
-      .get(`${api}/api/products`, {
+      .get(`${api}/api/cashdrawer`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => setProducts(response.data))
-      .catch((error) => console.error("Error fetching products:", error));
+      .then((response) => setCashDrawer(response.data))
+      .catch((error) => console.error("Error fetching cash drawer:", error));
 
     // Initialize SignalR connection
     const hubConnection = new HubConnectionBuilder()
-      .withUrl(`${api}/hubs/products`, {
+      .withUrl(`${api}/hubs/cashdrawer`, {
         accessTokenFactory: () => token,
       })
       .withAutomaticReconnect()
@@ -147,12 +127,8 @@ const DataTable = () => {
     hubConnection
       .start()
       .then(() => {
-        console.log("Connected to SignalR hub!");
-
-        // Listen for product updates
         hubConnection.on("ReceiveMessage", (message) => {
-          console.log("SignalR message received:", message);
-          fetchProducts(); // Fetch updated products
+          fetchCashDrawer();
         });
       })
       .catch((error) =>
@@ -166,13 +142,13 @@ const DataTable = () => {
     };
   }, [token]);
 
-  const fetchProducts = () => {
+  const fetchCashDrawer = () => {
     axios
-      .get(`${api}/api/products`, {
+      .get(`${api}/api/cashdrawer`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => setProducts(response.data))
-      .catch((error) => console.error("Error fetching products:", error));
+      .then((response) => setCashDrawer(response.data))
+      .catch((error) => console.error("Error fetching cash drawer:", error));
   };
 
   return (
@@ -192,9 +168,9 @@ const DataTable = () => {
               color: "#fff",
             },
           }}
-          getRowId={(row) => row.Id}
+          getRowId={(row) => row.DrawerId}
           columns={TableColumns}
-          rows={products != null && products}
+          rows={cashDrawer != null && cashDrawer}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 5 },

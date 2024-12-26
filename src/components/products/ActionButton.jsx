@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Delete, Edit } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useCookies } from "react-cookie";
+import { HubConnectionBuilder } from "@microsoft/signalr";
+import { ToggleMessage } from "../../libraries/SweetAlert";
+import { apiURL } from "../../hooks/Users";
 
 const Container = styled.div`
   display: flex;
@@ -23,18 +27,56 @@ const EditButton = styled(Edit)`
 `;
 
 function ActionButton({ params }) {
+  const [cookies, setCookies] = useCookies(["access_token"]);
+  const token = cookies.access_token;
+  const [connection, setConnection] = useState(null);
   const navigate = useNavigate();
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjNiZTVjZWJjLThkNDktNGY4Yy1iODkzLTYxNjRmNTNkMjY3YyIsImV4cCI6MTczNDc4NzMzOSwiaXNzIjoiSnd0QXV0aEFwaSIsImF1ZCI6Ikp3dEF1dGhBcGlVc2VycyJ9.eGF46l67kS30y-_g8p_gLy36G-HTLf0B8eMhdr9EMo0";
+  const api = apiURL();
+
+  useEffect(() => {
+    // Initialize SignalR connection
+    const hubConnection = new HubConnectionBuilder()
+      .withUrl(`${api}/hubs/products`, {
+        accessTokenFactory: () => token,
+      })
+      .withAutomaticReconnect()
+      .build();
+
+    hubConnection
+      .start()
+      .then(() => {
+        hubConnection.on("ReceiveMessage", (message) => {
+          //console.log("SignalR message received:", message);
+        });
+      })
+      .catch((error) =>
+        console.error("Error connecting to SignalR hub:", error)
+      );
+
+    setConnection(hubConnection);
+
+    return () => {
+      hubConnection.stop();
+    };
+  }, [token]);
 
   const _delete = (id) => {
     try {
       axios
-        .put(`https://localhost:7148/api/products/remove/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .put(
+          `${api}/api/products/remove/${id}`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
         .then((res) => {
-          console.log(res);
+          if (res.status === 204) {
+            if (connection) {
+              connection.send("NotifyClients", "Product Disabled");
+            }
+            ToggleMessage("success", "Product successfully disabled.");
+          }
         })
         .catch((err) => {
           if (err.response) Error();

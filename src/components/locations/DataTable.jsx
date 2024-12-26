@@ -4,6 +4,8 @@ import styled from "styled-components";
 import ActionButton from "./ActionButton";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import axios from "axios";
+import { useCookies } from "react-cookie";
+import { apiURL } from "../../hooks/Users";
 
 const PageContainer = styled.div`
   display: flex;
@@ -13,8 +15,8 @@ const PageContainer = styled.div`
 
 const TableColumns = [
   {
-    field: "Id",
-    headerName: "ID",
+    field: "LocationId",
+    headerName: "Location ID",
     flex: 1,
     resizable: false,
     headerClassName: "theme-header",
@@ -25,6 +27,19 @@ const TableColumns = [
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
+  },
+  {
+    field: "Status",
+    headerName: "Status",
+    flex: 1,
+    headerClassName: "theme-header",
+    resizable: false,
+    valueGetter: (params) => {
+      if (params === 1) {
+        return "Enable"; // Display "Enable" when Status = 1
+      }
+      return "Disable"; // Display "Disable" otherwise
+    },
   },
   {
     field: "DateCreated",
@@ -45,25 +60,23 @@ const TableColumns = [
 ];
 
 const DataTable = () => {
-  const [products, setProducts] = useState([]);
-  /* const [connection, setConnection] = useState(null);
-
-  console.log(products);
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjNiZTVjZWJjLThkNDktNGY4Yy1iODkzLTYxNjRmNTNkMjY3YyIsImV4cCI6MTczNDc4NzMzOSwiaXNzIjoiSnd0QXV0aEFwaSIsImF1ZCI6Ikp3dEF1dGhBcGlVc2VycyJ9.eGF46l67kS30y-_g8p_gLy36G-HTLf0B8eMhdr9EMo0";
+  const [location, setLocation] = useState([]);
+  const [connection, setConnection] = useState(null);
+  const [cookies, setCookies] = useCookies(["access_token"]);
+  const token = cookies.access_token;
+  const api = apiURL();
 
   useEffect(() => {
-    // Fetch initial product list with Authorization header
     axios
-      .get("https://localhost:7148/api/products", {
+      .get(`${api}/api/locations`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => setProducts(response.data))
-      .catch((error) => console.error("Error fetching products:", error));
+      .then((response) => setLocation(response.data))
+      .catch((error) => console.error("Error fetching locations:", error));
 
     // Initialize SignalR connection
     const hubConnection = new HubConnectionBuilder()
-      .withUrl("https://localhost:7148/hubs/products", {
+      .withUrl(`${api}/hubs/locations`, {
         accessTokenFactory: () => token,
       })
       .withAutomaticReconnect()
@@ -72,12 +85,8 @@ const DataTable = () => {
     hubConnection
       .start()
       .then(() => {
-        console.log("Connected to SignalR hub!");
-
-        // Listen for product updates
         hubConnection.on("ReceiveMessage", (message) => {
-          console.log("SignalR message received:", message);
-          fetchProducts(); // Fetch updated products
+          fetchLocations();
         });
       })
       .catch((error) =>
@@ -91,14 +100,14 @@ const DataTable = () => {
     };
   }, [token]);
 
-  const fetchProducts = () => {
+  const fetchLocations = () => {
     axios
-      .get("https://localhost:7148/api/products", {
+      .get(`${api}/api/locations`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => setProducts(response.data))
-      .catch((error) => console.error("Error fetching products:", error));
-  };*/
+      .then((response) => setLocation(response.data))
+      .catch((error) => console.error("Error fetching locations:", error));
+  };
 
   return (
     <>
@@ -117,9 +126,9 @@ const DataTable = () => {
               color: "#fff",
             },
           }}
-          getRowId={(row) => row.Id}
+          getRowId={(row) => row.LocationId}
           columns={TableColumns}
-          rows={products != null && products}
+          rows={location != null && location}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 5 },

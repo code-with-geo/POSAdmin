@@ -36,7 +36,7 @@ function ActionButton({ params }) {
   useEffect(() => {
     // Initialize SignalR connection
     const hubConnection = new HubConnectionBuilder()
-      .withUrl(`${api}/hubs/discounts`, {
+      .withUrl(`${api}/hubs/cashdrawer`, {
         accessTokenFactory: () => token,
       })
       .withAutomaticReconnect()
@@ -64,7 +64,7 @@ function ActionButton({ params }) {
     try {
       axios
         .put(
-          `${api}/api/discounts/remove/${id}`,
+          `${api}/api/cashdrawer/remove/${id}`,
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -73,9 +73,9 @@ function ActionButton({ params }) {
         .then((res) => {
           if (res.status === 204) {
             if (connection) {
-              connection.send("NotifyClients", "Discount Disabled");
+              connection.send("NotifyClients", "Cash Drawer Disabled");
             }
-            ToggleMessage("success", "Discount successfully disabled.");
+            ToggleMessage("success", "Cash drawer successfully disabled.");
           }
         })
         .catch((err) => {
@@ -92,12 +92,12 @@ function ActionButton({ params }) {
         <Tooltip title="Edit">
           <EditButton
             onClick={() =>
-              navigate(`/dashboard/discounts/edit/${params.row.DiscountId}`)
+              navigate(`/dashboard/cash-drawer/edit/${params.row.DrawerId}`)
             }
           />
         </Tooltip>
         <Tooltip title="Delete">
-          <DeleteButton onClick={() => _delete(params.row.DiscountId)} />
+          <DeleteButton onClick={() => _delete(params.row.DrawerId)} />
         </Tooltip>
       </Container>
     </>

@@ -1,10 +1,13 @@
 import { ArrowLeft, Article } from "@mui/icons-material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Button, TextBox } from "../../components/styles/Component.styled";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
+import { useCookies } from "react-cookie";
+import { ToggleMessage } from "../../libraries/SweetAlert";
+import { apiURL } from "../../hooks/Users";
 
 const Container = styled.div`
   padding: 10px;
@@ -54,8 +57,66 @@ const ComboBox = styled.select`
   }
 `;
 
+const ErrorMessage = styled.p`
+  font-weight: 400;
+  font-size: 12px;
+  color: #c03333;
+  margin-top: 5px;
+`;
+
 function AddUser() {
+  const [cookies, setCookies] = useCookies(["access_token"]);
+  const token = cookies.access_token;
   const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const api = apiURL();
+
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isRole, setIsRole] = useState();
+  const [status, setStatus] = useState(1);
+
+  const onChangeRole = (event) => {
+    setIsRole(event.target.value);
+  };
+
+  const _add = (data, event) => {
+    event.preventDefault();
+    try {
+      axios
+        .post(
+          `${api}/api/auth`,
+          {
+            name,
+            username,
+            password,
+            isrole: isRole,
+            status,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then((res) => {
+          console.log(res);
+          if (res.status === 201) {
+            ToggleMessage("success", "User successfully added.");
+            navigate("/dashboard/users");
+          } else {
+            ToggleMessage("error", "Please contact technical support.");
+          }
+        })
+        .catch((err) => {
+          if (err.response) Error();
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <Container>
@@ -73,7 +134,7 @@ function AddUser() {
             </h3>
           </Header>
           <Body>
-            <Form>
+            <Form onSubmit={handleSubmit(_add)}>
               <List>
                 <ListItem>
                   <TextBox
@@ -84,6 +145,10 @@ function AddUser() {
                     fontSize="13px"
                     placeholder="Name"
                     required="true"
+                    {...register("Name")}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>
@@ -95,6 +160,10 @@ function AddUser() {
                     fontSize="13px"
                     placeholder="Username"
                     required="true"
+                    {...register("Username")}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>
@@ -106,15 +175,29 @@ function AddUser() {
                     fontSize="13px"
                     placeholder="Password"
                     required="true"
+                    {...register("Password")}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>
-                  <ComboBox>
+                  <ComboBox
+                    {...register("Role", {
+                      validate: (value) => value !== "",
+                    })}
+                    value={isRole}
+                    onChange={onChangeRole}
+                  >
                     <option value="">Select a Role</option>
-                    <option value="">Administrator</option>
-                    <option value="">Cashier</option>
-                    <option value="">Staff</option>
+                    <option value="0">Administrator</option>
+                    <option value="1">Cashier</option>
+                    <option value="2">Staff</option>
+                    <option value="3">Stock Controller</option>
                   </ComboBox>
+                  {errors.Role && (
+                    <ErrorMessage>Please select role</ErrorMessage>
+                  )}
                 </ListItem>
                 <ListItem>
                   <Button
@@ -130,7 +213,7 @@ function AddUser() {
                     marginLeft="10px"
                     hoverbgColor="#697565"
                   >
-                    Save
+                    "Save"
                   </Button>
                 </ListItem>
               </List>

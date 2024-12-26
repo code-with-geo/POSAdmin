@@ -1,11 +1,12 @@
 import React from "react";
 import styled from "styled-components";
-import DataTable from "../../components/users/DataTable";
+import DataTable from "../../components/cash-drawer/DataTable";
 import { PageLink } from "../../components/styles/Component.styled";
 import { Article } from "@mui/icons-material";
 
 const Container = styled.div`
-  padding: 5px;
+  padding: 10px;
+
   h3 {
     display: flex;
     align-items: center;
@@ -22,14 +23,14 @@ const Body = styled.div`
   overflow-x: auto;
 `;
 
-function Users() {
+function CashDrawer() {
   return (
     <>
       <Container>
         <Wrapper>
           <Header>
             <h3>
-              <Article fontSize="small" /> Users
+              <Article fontSize="small" /> Cash Drawer
             </h3>
             <PageLink
               color="#FFF"
@@ -39,9 +40,9 @@ function Users() {
               textAlign="center"
               borderRadius="5px"
               hoverbgColor="#697565"
-              to="/dashboard/users/add"
+              to="/dashboard/cash-drawer/add"
             >
-              Create User
+              Create Cash Drawer
             </PageLink>
           </Header>
           <Body>
@@ -53,4 +54,4 @@ function Users() {
   );
 }
 
-export default Users;
+export default CashDrawer;

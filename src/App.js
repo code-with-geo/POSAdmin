@@ -22,22 +22,43 @@ import EditSupplier from "./page/suppliers/EditSupplier";
 import Discounts from "./page/discounts/Discounts";
 import AddDiscount from "./page/discounts/AddDiscount";
 import EditDiscount from "./page/discounts/EditDiscount";
+import Login from "./page/authentication/Login";
+import ProtectedRoute from "./context/ProtectedRoute";
+import CashDrawer from "./page/cash-drawer/CashDrawer";
+import AddCashDrawer from "./page/cash-drawer/AddCashDrawer";
+import EditCashDrawer from "./page/cash-drawer/EditCashDrawer";
+import Home from "./page/Home";
 
 function App() {
   return (
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/dashboard" element={<Dashboard />}>
+          <Route path="/" element={<Login />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Home />} />
             <Route path="/dashboard/users" element={<Users />} />
             <Route path="/dashboard/users/add" element={<AddUser />} />
-            <Route path="/dashboard/users/edit" element={<EditUser />} />
+            <Route path="/dashboard/users/edit/:id" element={<EditUser />} />
             <Route path="/dashboard/products" element={<Products />} />
             <Route path="/dashboard/products/add" element={<AddProduct />} />
-            <Route path="/dashboard/products/edit" element={<EditProduct />} />
+            <Route
+              path="/dashboard/products/edit/:id"
+              element={<EditProduct />}
+            />
             <Route path="/dashboard/category" element={<Category />} />
             <Route path="/dashboard/category/add" element={<AddCategory />} />
-            <Route path="/dashboard/category/edit" element={<EditCategory />} />
+            <Route
+              path="/dashboard/category/edit/:id"
+              element={<EditCategory />}
+            />
             <Route path="/dashboard/inventory" element={<Inventory />} />
             <Route path="/dashboard/inventory/add" element={<AddInventory />} />
             <Route
@@ -47,20 +68,29 @@ function App() {
             <Route path="/dashboard/locations" element={<Locations />} />
             <Route path="/dashboard/locations/add" element={<AddLocation />} />
             <Route
-              path="/dashboard/locations/edit"
+              path="/dashboard/locations/edit/:id"
               element={<EditLocation />}
             />
             <Route path="/dashboard/suppliers" element={<Suppliers />} />
             <Route path="/dashboard/suppliers/add" element={<AddSupplier />} />
             <Route
-              path="/dashboard/suppliers/edit"
+              path="/dashboard/suppliers/edit/:id"
               element={<EditSupplier />}
             />
             <Route path="/dashboard/discounts" element={<Discounts />} />
             <Route path="/dashboard/discounts/add" element={<AddDiscount />} />
             <Route
-              path="/dashboard/discounts/edit"
+              path="/dashboard/discounts/edit/:id"
               element={<EditDiscount />}
+            />
+            <Route path="/dashboard/cash-drawer" element={<CashDrawer />} />
+            <Route
+              path="/dashboard/cash-drawer/add"
+              element={<AddCashDrawer />}
+            />
+            <Route
+              path="/dashboard/cash-drawer/edit/:id"
+              element={<EditCashDrawer />}
             />
           </Route>
         </Routes>

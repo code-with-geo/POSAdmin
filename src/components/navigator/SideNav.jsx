@@ -9,11 +9,14 @@ import {
   Category,
   Close,
   Dashboard,
+  Discount,
   Home,
   Inventory,
   KeyboardArrowLeft,
   KeyboardArrowRight,
+  LocalShipping,
   Menu,
+  Money,
   Receipt,
   Warehouse,
 } from "@mui/icons-material";
@@ -133,9 +136,10 @@ const SideNav = () => {
           <h3>Dashboard</h3>
           <DrawerContent>
             <DrawerItem
-              to="/dashboard/products"
+              to="/dashboard/"
               onClick={toggleDrawer}
               className={({ isActive }) => (isActive ? "active" : "")}
+              end
             >
               <Dashboard fontSize="small" /> Home
             </DrawerItem>
@@ -146,7 +150,7 @@ const SideNav = () => {
             >
               <AccountCircle fontSize="small" /> Users
             </DrawerItem>
-            <DrawerItem
+            {/* <DrawerItem
               to="/contact"
               onClick={toggleDrawer}
               className={({ isActive }) => (isActive ? "active" : "")}
@@ -159,7 +163,7 @@ const SideNav = () => {
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               <Assessment fontSize="small" /> Reports
-            </DrawerItem>
+            </DrawerItem> */}
             <DrawerItem
               to="/dashboard/products"
               onClick={toggleDrawer}
@@ -193,21 +197,21 @@ const SideNav = () => {
               onClick={toggleDrawer}
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              <Warehouse fontSize="small" /> Supplier
+              <LocalShipping fontSize="small" /> Supplier
             </DrawerItem>
             <DrawerItem
               to="/dashboard/discounts"
               onClick={toggleDrawer}
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              <Warehouse fontSize="small" /> Discount
+              <Discount fontSize="small" /> Discount
             </DrawerItem>
             <DrawerItem
               to="/dashboard/cash-drawer"
               onClick={toggleDrawer}
               className={({ isActive }) => (isActive ? "active" : "")}
             >
-              <Warehouse fontSize="small" /> Cash Drawer
+              <Money fontSize="small" /> Cash Drawer
             </DrawerItem>
           </DrawerContent>
         </Drawer>

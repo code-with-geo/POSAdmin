@@ -31,7 +31,7 @@ const List = styled.ul`
 `;
 const ListItem = styled.li``;
 
-function AddDiscount() {
+function AddCashDrawer() {
   const [cookies, setCookies] = useCookies(["access_token"]);
   const token = cookies.access_token;
   const navigate = useNavigate();
@@ -42,8 +42,12 @@ function AddDiscount() {
   } = useForm();
   const api = apiURL();
 
-  const [name, setName] = useState("");
-  const [percentage, setPercentage] = useState();
+  const [cashier, setCashier] = useState("");
+  const [initialCash, setInitialCash] = useState();
+  const [totalSales, setTotalSales] = useState();
+  const [withdrawals, setWithdrawals] = useState();
+  const [expense, setExpense] = useState();
+  const [drawerCash, setDrawerCash] = useState();
   const [status, setStatus] = useState(1);
 
   const _add = (data, event) => {
@@ -51,10 +55,14 @@ function AddDiscount() {
     try {
       axios
         .post(
-          `${api}/api/discounts`,
+          `${api}/api/cashdrawer`,
           {
-            name,
-            percentage,
+            cashier,
+            initialcash: initialCash,
+            totalsales: totalSales,
+            withdrawals,
+            expense,
+            drawercash: drawerCash,
             status,
           },
           { headers: { Authorization: `Bearer ${token}` } }
@@ -62,8 +70,8 @@ function AddDiscount() {
         .then((res) => {
           console.log(res);
           if (res.status === 201) {
-            ToggleMessage("success", "Discount successfully added.");
-            navigate("/dashboard/discounts");
+            ToggleMessage("success", "Cash drawer successfully added.");
+            navigate("/dashboard/cash-drawer");
           } else {
             ToggleMessage("error", "Please contact technical support.");
           }
@@ -85,11 +93,11 @@ function AddDiscount() {
               <ArrowLeft
                 fontSize="small"
                 onClick={() => {
-                  navigate("/dashboard/discounts");
+                  navigate("/dashboard/cash-drawer");
                 }}
                 sx={{ cursor: "pointer" }}
               />
-              <Article fontSize="small" /> Create Discount
+              <Article fontSize="small" /> Create Cash Drawer
             </h3>
           </Header>
           <Body>
@@ -102,11 +110,11 @@ function AddDiscount() {
                     height="40px"
                     width="250px"
                     fontSize="13px"
-                    placeholder="Name"
+                    placeholder="Cashier"
                     required="true"
-                    {...register("Name")}
+                    {...register("Cashier")}
                     onChange={(e) => {
-                      setName(e.target.value);
+                      setCashier(e.target.value);
                     }}
                   />
                 </ListItem>
@@ -117,11 +125,71 @@ function AddDiscount() {
                     height="40px"
                     width="250px"
                     fontSize="13px"
-                    placeholder="Percentage"
+                    placeholder="Initial Cash"
                     required="true"
-                    {...register("Percentage")}
+                    {...register("InitialCash")}
                     onChange={(e) => {
-                      setPercentage(e.target.value);
+                      setInitialCash(e.target.value);
+                    }}
+                  />
+                </ListItem>
+                <ListItem>
+                  <TextBox
+                    marginTop="10px"
+                    type="text"
+                    height="40px"
+                    width="250px"
+                    fontSize="13px"
+                    placeholder="Total Sales"
+                    required="true"
+                    {...register("TotalSales")}
+                    onChange={(e) => {
+                      setTotalSales(e.target.value);
+                    }}
+                  />
+                </ListItem>
+                <ListItem>
+                  <TextBox
+                    marginTop="10px"
+                    type="text"
+                    height="40px"
+                    width="250px"
+                    fontSize="13px"
+                    placeholder="Withdrawals"
+                    required="true"
+                    {...register("Withdrawals")}
+                    onChange={(e) => {
+                      setWithdrawals(e.target.value);
+                    }}
+                  />
+                </ListItem>
+                <ListItem>
+                  <TextBox
+                    marginTop="10px"
+                    type="text"
+                    height="40px"
+                    width="250px"
+                    fontSize="13px"
+                    placeholder="Expense"
+                    required="true"
+                    {...register("Expense")}
+                    onChange={(e) => {
+                      setExpense(e.target.value);
+                    }}
+                  />
+                </ListItem>
+                <ListItem>
+                  <TextBox
+                    marginTop="10px"
+                    type="text"
+                    height="40px"
+                    width="250px"
+                    fontSize="13px"
+                    placeholder="Drawer Cash"
+                    required="true"
+                    {...register("DrawerCash")}
+                    onChange={(e) => {
+                      setDrawerCash(e.target.value);
                     }}
                   />
                 </ListItem>
@@ -151,4 +219,4 @@ function AddDiscount() {
   );
 }
 
-export default AddDiscount;
+export default AddCashDrawer;

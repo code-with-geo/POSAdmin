@@ -2,12 +2,12 @@ import { ArrowLeft, Article } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button, TextBox } from "../../components/styles/Component.styled";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useCookies } from "react-cookie";
-import { ToggleMessage } from "../../libraries/SweetAlert";
 import { apiURL } from "../../hooks/Users";
+import { ToggleMessage } from "../../libraries/SweetAlert";
 
 const Container = styled.div`
   padding: 10px;
@@ -31,83 +31,51 @@ const List = styled.ul`
 `;
 const ListItem = styled.li``;
 
-const ComboBox = styled.select`
-  width: 270px;
-  height: 40px;
-  line-height: 2;
-  padding: 0 0.5rem;
-  border: 2px solid transparent;
-  border-radius: 5px;
-  outline: none;
-  background-color: #fff;
-  color: rgba(0, 0, 0, 0.7);
-  transition: 0.3s ease;
-  border-color: #e2e8ec;
-  margin-top: 10px;
+function EditCashDrawer() {
+  const navigate = useNavigate();
 
-  &:focus {
-    outline: none;
-    border-color: #697565;
-    background-color: #fff;
-  }
-
-  &:hover {
-    border-color: #697565;
-    cursor: pointer;
-  }
-`;
-
-function AddProduct() {
   const [cookies, setCookies] = useCookies(["access_token"]);
   const token = cookies.access_token;
-  const navigate = useNavigate();
+
+  const api = apiURL();
+  const [connection, setConnection] = useState(null);
+  const { id } = useParams();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const api = apiURL();
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [wholesalePrice, setWholesalePrice] = useState(0);
-  const [retailPrice, setRetailPrice] = useState(0);
-  const [supplierPrice, setSupplierPrice] = useState(0);
-  const [reorderLevel, setReorderLevel] = useState(0);
-  const [isVat, setIsVat] = useState(1);
-  const [status, setStatus] = useState(1);
+  const [cashDrawer, setCashDrawer] = useState([]);
+  const [cashier, setCashier] = useState("");
+  const [initialCash, setInitialCash] = useState();
+  const [totalSales, setTotalSales] = useState();
+  const [withdrawals, setWithdrawals] = useState();
+  const [expense, setExpense] = useState();
+  const [drawerCash, setDrawerCash] = useState();
 
-  const [category, setCategory] = useState([]);
-  const [categoryID, setCategoryID] = useState("");
-
-  const onChangeCategory = (event) => {
-    setCategoryID(event.target.value);
-  };
-
-  const _add = (data, event) => {
+  const _edit = (data, event) => {
     event.preventDefault();
     try {
       axios
-        .post(
-          `${api}/api/products`,
+        .put(
+          `${api}/api/cashdrawer/${id}`,
           {
-            name: name,
-            description: description,
-            wholesaleprice: wholesalePrice,
-            retailprice: retailPrice,
-            supplierprice: supplierPrice,
-            reorderlevel: reorderLevel,
-            isvat: isVat,
-            status,
-            categoryid: categoryID,
+            cashier,
+            initialcash: initialCash,
+            totalsales: totalSales,
+            withdrawals,
+            expense,
+            drawercash: drawerCash,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         )
         .then((res) => {
           console.log(res);
-          if (res.status === 201) {
-            ToggleMessage("success", "Discount successfully added.");
-            navigate("/dashboard/products");
+          if (res.status === 204) {
+            ToggleMessage("success", "Cash drawer successfully updated.");
+            navigate("/dashboard/cash-drawer");
+          } else if (res.status === 402) {
           } else {
             ToggleMessage("error", "Please contact technical support.");
           }
@@ -120,14 +88,29 @@ function AddProduct() {
     }
   };
 
-  useEffect(() => {
+  const fetchCashDrawer = () => {
     axios
-      .get(`${api}/api/category`, {
+      .get(`${api}/api/cashdrawer/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => setCategory(response.data))
-      .catch((error) => console.error("Error fetching products:", error));
-  }, [token]);
+      .then((response) => setCashDrawer(response.data))
+      .catch((error) => console.error("Error fetching cash drawer:", error));
+  };
+
+  useEffect(() => {
+    fetchCashDrawer();
+  }, []);
+
+  useEffect(() => {
+    if (cashDrawer != null) {
+      setCashier(cashDrawer.Cashier);
+      setInitialCash(cashDrawer.InitialCash);
+      setTotalSales(cashDrawer.TotalSales);
+      setWithdrawals(cashDrawer.Withdrawals);
+      setExpense(cashDrawer.Expense);
+      setDrawerCash(cashDrawer.DrawerCash);
+    }
+  }, [cashDrawer]);
 
   return (
     <>
@@ -138,15 +121,15 @@ function AddProduct() {
               <ArrowLeft
                 fontSize="small"
                 onClick={() => {
-                  navigate("/dashboard/products");
+                  navigate("/dashboard/cash-drawer");
                 }}
                 sx={{ cursor: "pointer" }}
               />
-              <Article fontSize="small" /> Create Product
+              <Article fontSize="small" /> Edit Cash Drawer
             </h3>
           </Header>
           <Body>
-            <Form onSubmit={handleSubmit(_add)}>
+            <Form onSubmit={handleSubmit(_edit)}>
               <List>
                 <ListItem>
                   <TextBox
@@ -155,22 +138,12 @@ function AddProduct() {
                     height="40px"
                     width="250px"
                     fontSize="13px"
-                    placeholder="Barcode"
+                    placeholder="Cashier"
                     required="true"
-                  />
-                </ListItem>
-                <ListItem>
-                  <TextBox
-                    marginTop="10px"
-                    type="text"
-                    height="40px"
-                    width="250px"
-                    fontSize="13px"
-                    placeholder="Name"
-                    required="true"
-                    {...register("Name")}
+                    {...register("Cashier")}
+                    value={cashier}
                     onChange={(e) => {
-                      setName(e.target.value);
+                      setCashier(e.target.value);
                     }}
                   />
                 </ListItem>
@@ -181,10 +154,12 @@ function AddProduct() {
                     height="40px"
                     width="250px"
                     fontSize="13px"
-                    placeholder="Description"
+                    placeholder="Initial Cash"
                     required="true"
+                    {...register("InitialCash")}
+                    value={initialCash}
                     onChange={(e) => {
-                      setDescription(e.target.value);
+                      setInitialCash(e.target.value);
                     }}
                   />
                 </ListItem>
@@ -195,10 +170,12 @@ function AddProduct() {
                     height="40px"
                     width="250px"
                     fontSize="13px"
-                    placeholder="Supplier Price"
+                    placeholder="Total Sales"
                     required="true"
+                    {...register("TotalSales")}
+                    value={totalSales}
                     onChange={(e) => {
-                      setSupplierPrice(e.target.value);
+                      setTotalSales(e.target.value);
                     }}
                   />
                 </ListItem>
@@ -209,10 +186,12 @@ function AddProduct() {
                     height="40px"
                     width="250px"
                     fontSize="13px"
-                    placeholder="Retail Price"
+                    placeholder="Withdrawals"
                     required="true"
+                    {...register("Withdrawals")}
+                    value={withdrawals}
                     onChange={(e) => {
-                      setRetailPrice(e.target.value);
+                      setWithdrawals(e.target.value);
                     }}
                   />
                 </ListItem>
@@ -223,10 +202,12 @@ function AddProduct() {
                     height="40px"
                     width="250px"
                     fontSize="13px"
-                    placeholder="Wholesale Price"
+                    placeholder="Expense"
                     required="true"
+                    {...register("Expense")}
+                    value={expense}
                     onChange={(e) => {
-                      setWholesalePrice(e.target.value);
+                      setExpense(e.target.value);
                     }}
                   />
                 </ListItem>
@@ -237,40 +218,14 @@ function AddProduct() {
                     height="40px"
                     width="250px"
                     fontSize="13px"
-                    placeholder="Reorder Level"
+                    placeholder="Drawer Cash"
                     required="true"
+                    {...register("DrawerCash")}
+                    value={drawerCash}
                     onChange={(e) => {
-                      setReorderLevel(e.target.value);
+                      setDrawerCash(e.target.value);
                     }}
                   />
-                </ListItem>
-                <ListItem>
-                  <TextBox
-                    marginTop="10px"
-                    type="text"
-                    height="40px"
-                    width="250px"
-                    fontSize="13px"
-                    placeholder="Remarks"
-                    required="true"
-                  />
-                </ListItem>
-                <ListItem>
-                  <ComboBox
-                    {...register("Category", {
-                      validate: (value) => value !== "",
-                    })}
-                    value={categoryID}
-                    onChange={onChangeCategory}
-                  >
-                    <option value="">Select a Category</option>
-                    {category != null &&
-                      category.map((cate) => (
-                        <option key={cate.CategoryId} value={cate.CategoryId}>
-                          {cate.Name}
-                        </option>
-                      ))}
-                  </ComboBox>
                 </ListItem>
                 <ListItem>
                   <Button
@@ -298,4 +253,4 @@ function AddProduct() {
   );
 }
 
-export default AddProduct;
+export default EditCashDrawer;

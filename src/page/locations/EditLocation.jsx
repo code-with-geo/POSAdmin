@@ -2,9 +2,12 @@ import { ArrowLeft, Article } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button, TextBox } from "../../components/styles/Component.styled";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
+import { useCookies } from "react-cookie";
+import { apiURL } from "../../hooks/Users";
+import { ToggleMessage } from "../../libraries/SweetAlert";
 
 const Container = styled.div`
   padding: 10px;
@@ -30,6 +33,70 @@ const ListItem = styled.li``;
 
 function EditLocation() {
   const navigate = useNavigate();
+
+  const [cookies, setCookies] = useCookies(["access_token"]);
+  const token = cookies.access_token;
+
+  const api = apiURL();
+  const [connection, setConnection] = useState(null);
+  const { id } = useParams();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const [location, setLocation] = useState([]);
+  const [name, setName] = useState("");
+
+  const _edit = (data, event) => {
+    event.preventDefault();
+    try {
+      axios
+        .put(
+          `${api}/api/locations/${id}`,
+          {
+            name,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then((res) => {
+          console.log(res);
+          if (res.status === 204) {
+            ToggleMessage("success", "Location successfully updated.");
+            navigate("/dashboard/locations");
+          } else if (res.status === 402) {
+          } else {
+            ToggleMessage("error", "Please contact technical support.");
+          }
+        })
+        .catch((err) => {
+          if (err.response) Error();
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchLocations = () => {
+    axios
+      .get(`${api}/api/locations/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => setLocation(response.data))
+      .catch((error) => console.error("Error fetching location:", error));
+  };
+
+  useEffect(() => {
+    fetchLocations();
+  }, []);
+
+  useEffect(() => {
+    if (location != null) {
+      setName(location.Name);
+    }
+  }, [location]);
+
   return (
     <>
       <Container>
@@ -47,7 +114,7 @@ function EditLocation() {
             </h3>
           </Header>
           <Body>
-            <Form>
+            <Form onSubmit={handleSubmit(_edit)}>
               <List>
                 <ListItem>
                   <TextBox
@@ -58,6 +125,11 @@ function EditLocation() {
                     fontSize="13px"
                     placeholder="Name"
                     required="true"
+                    {...register("Name")}
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>

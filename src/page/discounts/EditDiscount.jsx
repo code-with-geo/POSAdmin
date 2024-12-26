@@ -2,9 +2,12 @@ import { ArrowLeft, Article } from "@mui/icons-material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Button, TextBox } from "../../components/styles/Component.styled";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
+import { useCookies } from "react-cookie";
+import { apiURL } from "../../hooks/Users";
+import { ToggleMessage } from "../../libraries/SweetAlert";
 
 const Container = styled.div`
   padding: 10px;
@@ -28,34 +31,75 @@ const List = styled.ul`
 `;
 const ListItem = styled.li``;
 
-const ComboBox = styled.select`
-  width: 270px;
-  height: 40px;
-  line-height: 2;
-  padding: 0 0.5rem;
-  border: 2px solid transparent;
-  border-radius: 5px;
-  outline: none;
-  background-color: #fff;
-  color: rgba(0, 0, 0, 0.7);
-  transition: 0.3s ease;
-  border-color: #e2e8ec;
-  margin-top: 10px;
-
-  &:focus {
-    outline: none;
-    border-color: #697565;
-    background-color: #fff;
-  }
-
-  &:hover {
-    border-color: #697565;
-    cursor: pointer;
-  }
-`;
-
 function EditDiscount() {
   const navigate = useNavigate();
+
+  const [cookies, setCookies] = useCookies(["access_token"]);
+  const token = cookies.access_token;
+
+  const api = apiURL();
+  const [connection, setConnection] = useState(null);
+  const { id } = useParams();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const [discount, setDiscount] = useState([]);
+  const [name, setName] = useState("");
+  const [percentage, setPercentage] = useState();
+
+  const _edit = (data, event) => {
+    event.preventDefault();
+    try {
+      axios
+        .put(
+          `${api}/api/discounts/${id}`,
+          {
+            name,
+            percentage,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then((res) => {
+          console.log(res);
+          if (res.status === 204) {
+            ToggleMessage("success", "Discount successfully updated.");
+            navigate("/dashboard/discounts");
+          } else if (res.status === 402) {
+          } else {
+            ToggleMessage("error", "Please contact technical support.");
+          }
+        })
+        .catch((err) => {
+          if (err.response) Error();
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchDiscounts = () => {
+    axios
+      .get(`${api}/api/discounts/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => setDiscount(response.data))
+      .catch((error) => console.error("Error fetching discount:", error));
+  };
+
+  useEffect(() => {
+    fetchDiscounts();
+  }, []);
+
+  useEffect(() => {
+    if (discount != null) {
+      setName(discount.Name);
+      setPercentage(discount.Percentage);
+    }
+  }, [discount]);
+
   return (
     <>
       <Container>
@@ -73,7 +117,7 @@ function EditDiscount() {
             </h3>
           </Header>
           <Body>
-            <Form>
+            <Form onSubmit={handleSubmit(_edit)}>
               <List>
                 <ListItem>
                   <TextBox
@@ -84,6 +128,11 @@ function EditDiscount() {
                     fontSize="13px"
                     placeholder="Name"
                     required="true"
+                    {...register("Name")}
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>
@@ -95,6 +144,11 @@ function EditDiscount() {
                     fontSize="13px"
                     placeholder="Percentage"
                     required="true"
+                    {...register("Percentage")}
+                    value={percentage}
+                    onChange={(e) => {
+                      setPercentage(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>

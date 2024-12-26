@@ -5,6 +5,9 @@ import { Button, TextBox } from "../../components/styles/Component.styled";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
+import { useCookies } from "react-cookie";
+import { ToggleMessage } from "../../libraries/SweetAlert";
+import { apiURL } from "../../hooks/Users";
 
 const Container = styled.div`
   padding: 10px;
@@ -29,7 +32,47 @@ const List = styled.ul`
 const ListItem = styled.li``;
 
 function AddLocation() {
+  const [cookies, setCookies] = useCookies(["access_token"]);
+  const token = cookies.access_token;
   const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const api = apiURL();
+
+  const [name, setName] = useState("");
+  const [status, setStatus] = useState(1);
+
+  const _add = (data, event) => {
+    event.preventDefault();
+    try {
+      axios
+        .post(
+          `${api}/api/locations`,
+          {
+            name,
+            status,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        .then((res) => {
+          console.log(res);
+          if (res.status === 201) {
+            ToggleMessage("success", "Category successfully added.");
+            navigate("/dashboard/locations");
+          } else {
+            ToggleMessage("error", "Please contact technical support.");
+          }
+        })
+        .catch((err) => {
+          if (err.response) Error();
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <>
       <Container>
@@ -47,7 +90,7 @@ function AddLocation() {
             </h3>
           </Header>
           <Body>
-            <Form>
+            <Form onSubmit={handleSubmit(_add)}>
               <List>
                 <ListItem>
                   <TextBox
@@ -58,6 +101,10 @@ function AddLocation() {
                     fontSize="13px"
                     placeholder="Name"
                     required="true"
+                    {...register("Name")}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>

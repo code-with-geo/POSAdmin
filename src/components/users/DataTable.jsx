@@ -4,6 +4,8 @@ import styled from "styled-components";
 import ActionButton from "./ActionButton";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import axios from "axios";
+import { useCookies } from "react-cookie";
+import { apiURL } from "../../hooks/Users";
 
 const PageContainer = styled.div`
   display: flex;
@@ -41,11 +43,23 @@ const TableColumns = [
     resizable: false,
   },
   {
-    field: "Role",
+    field: "IsRole",
     headerName: "Role",
     flex: 1,
     headerClassName: "theme-header",
     resizable: false,
+    valueGetter: (params) => {
+      switch (params.value) {
+        case 1:
+          return "Cashier";
+        case 2:
+          return "Staff";
+        case 3:
+          return "Stock Controller";
+        default:
+          return "Administrator";
+      }
+    },
   },
   {
     field: "Status",
@@ -79,25 +93,23 @@ const TableColumns = [
 ];
 
 const DataTable = () => {
-  const [products, setProducts] = useState([]);
-  /* const [connection, setConnection] = useState(null);
-
-  console.log(products);
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsImp0aSI6IjNiZTVjZWJjLThkNDktNGY4Yy1iODkzLTYxNjRmNTNkMjY3YyIsImV4cCI6MTczNDc4NzMzOSwiaXNzIjoiSnd0QXV0aEFwaSIsImF1ZCI6Ikp3dEF1dGhBcGlVc2VycyJ9.eGF46l67kS30y-_g8p_gLy36G-HTLf0B8eMhdr9EMo0";
+  const [users, setUsers] = useState([]);
+  const [connection, setConnection] = useState(null);
+  const [cookies, setCookies] = useCookies(["access_token"]);
+  const token = cookies.access_token;
+  const api = apiURL();
 
   useEffect(() => {
-    // Fetch initial product list with Authorization header
     axios
-      .get("https://localhost:7148/api/products", {
+      .get(`${api}/api/auth`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => setProducts(response.data))
-      .catch((error) => console.error("Error fetching products:", error));
+      .then((response) => setUsers(response.data))
+      .catch((error) => console.error("Error fetching users:", error));
 
     // Initialize SignalR connection
     const hubConnection = new HubConnectionBuilder()
-      .withUrl("https://localhost:7148/hubs/products", {
+      .withUrl(`${api}/hubs/users`, {
         accessTokenFactory: () => token,
       })
       .withAutomaticReconnect()
@@ -106,12 +118,8 @@ const DataTable = () => {
     hubConnection
       .start()
       .then(() => {
-        console.log("Connected to SignalR hub!");
-
-        // Listen for product updates
         hubConnection.on("ReceiveMessage", (message) => {
-          console.log("SignalR message received:", message);
-          fetchProducts(); // Fetch updated products
+          fetchUsers();
         });
       })
       .catch((error) =>
@@ -125,14 +133,14 @@ const DataTable = () => {
     };
   }, [token]);
 
-  const fetchProducts = () => {
+  const fetchUsers = () => {
     axios
-      .get("https://localhost:7148/api/products", {
+      .get(`${api}/api/auth`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => setProducts(response.data))
-      .catch((error) => console.error("Error fetching products:", error));
-  };*/
+      .then((response) => setUsers(response.data))
+      .catch((error) => console.error("Error fetching users:", error));
+  };
 
   return (
     <>
@@ -153,7 +161,7 @@ const DataTable = () => {
           }}
           getRowId={(row) => row.Id}
           columns={TableColumns}
-          rows={products != null && products}
+          rows={users != null && users}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 5 },
