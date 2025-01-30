@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, Inventory, Person } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -22,6 +22,16 @@ const DeleteButton = styled(Delete)`
 `;
 
 const EditButton = styled(Edit)`
+  cursor: pointer;
+  color: #868e96;
+`;
+
+const UserButton = styled(Person)`
+  cursor: pointer;
+  color: #868e96;
+`;
+
+const InventoryButton = styled(Inventory)`
   cursor: pointer;
   color: #868e96;
 `;
@@ -93,6 +103,22 @@ function ActionButton({ params }) {
           <EditButton
             onClick={() =>
               navigate(`/dashboard/locations/edit/${params.row.LocationId}`)
+            }
+          />
+        </Tooltip>
+        <Tooltip title="Users">
+          <UserButton
+            onClick={() =>
+              navigate(`/dashboard/locations/users/${params.row.LocationId}`)
+            }
+          />{" "}
+        </Tooltip>
+        <Tooltip title="Inventory">
+          <InventoryButton
+            onClick={() =>
+              navigate(
+                `/dashboard/locations/inventory/${params.row.LocationId}`
+              )
             }
           />
         </Tooltip>

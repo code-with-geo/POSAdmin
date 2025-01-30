@@ -40,8 +40,9 @@ function Login() {
         )
         .then((res) => {
           if (res.status === 200) {
-            console.log(res);
             setCookies("access_token", res.data.Token);
+            window.localStorage.setItem("UserID", res.data.UserId);
+            window.localStorage.setItem("LocationId", res.data.LocationId);
             navigate("/dashboard/");
           } else if (res.status === 401) {
             ToggleMessage("error", "Incorrect username or password.");
@@ -74,7 +75,7 @@ function Login() {
             />
             <TextBox
               marginTop="10px"
-              type="text"
+              type="password"
               height="40px"
               width="250px"
               fontSize="13px"

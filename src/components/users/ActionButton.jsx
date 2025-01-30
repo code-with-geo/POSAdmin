@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Delete, Edit } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useCookies } from "react-cookie";
 import { HubConnectionBuilder } from "@microsoft/signalr";
@@ -86,12 +86,16 @@ function ActionButton({ params }) {
     }
   };
 
+  const { id } = useParams();
+
   return (
     <>
       <Container>
         <Tooltip title="Edit">
           <EditButton
-            onClick={() => navigate(`/dashboard/users/edit/${params.row.Id}`)}
+            onClick={() =>
+              navigate(`/dashboard/locations/users/${id}/edit/${params.row.Id}`)
+            }
           />
         </Tooltip>
         <Tooltip title="Delete">

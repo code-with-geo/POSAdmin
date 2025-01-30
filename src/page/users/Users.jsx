@@ -2,7 +2,8 @@ import React from "react";
 import styled from "styled-components";
 import DataTable from "../../components/users/DataTable";
 import { PageLink } from "../../components/styles/Component.styled";
-import { Article } from "@mui/icons-material";
+import { ArrowLeft, Article } from "@mui/icons-material";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Container = styled.div`
   padding: 5px;
@@ -23,12 +24,21 @@ const Body = styled.div`
 `;
 
 function Users() {
+  const { id } = useParams();
+  const navigate = useNavigate();
   return (
     <>
       <Container>
         <Wrapper>
           <Header>
             <h3>
+              <ArrowLeft
+                fontSize="small"
+                onClick={() => {
+                  navigate(`/dashboard/locations`);
+                }}
+                sx={{ cursor: "pointer" }}
+              />
               <Article fontSize="small" /> Users
             </h3>
             <PageLink
@@ -39,7 +49,7 @@ function Users() {
               textAlign="center"
               borderRadius="5px"
               hoverbgColor="#697565"
-              to="/dashboard/users/add"
+              to={`/dashboard/locations/users/add/${id}`}
             >
               Create User
             </PageLink>

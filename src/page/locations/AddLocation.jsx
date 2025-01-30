@@ -31,6 +31,40 @@ const List = styled.ul`
 `;
 const ListItem = styled.li``;
 
+const ComboBox = styled.select`
+  width: 270px;
+  height: 40px;
+  line-height: 2;
+  padding: 0 0.5rem;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  outline: none;
+  background-color: #fff;
+  color: rgba(0, 0, 0, 0.7);
+  transition: 0.3s ease;
+  border-color: #e2e8ec;
+  margin-top: 10px;
+
+  &:focus {
+    outline: none;
+    border-color: #697565;
+    background-color: #fff;
+  }
+
+  &:hover {
+    border-color: #697565;
+    cursor: pointer;
+  }
+`;
+
+const ErrorMessage = styled.p`
+  font-weight: 400;
+  font-size: 12px;
+  color: #c03333;
+  margin-left: 5px;
+  margin-top: 5px;
+`;
+
 function AddLocation() {
   const [cookies, setCookies] = useCookies(["access_token"]);
   const token = cookies.access_token;
@@ -45,6 +79,11 @@ function AddLocation() {
   const [name, setName] = useState("");
   const [status, setStatus] = useState(1);
 
+  const [locationType, setLocationType] = useState("");
+  const onChangeLocationType = (event) => {
+    setLocationType(event.target.value);
+  };
+
   const _add = (data, event) => {
     event.preventDefault();
     try {
@@ -54,6 +93,7 @@ function AddLocation() {
           {
             name,
             status,
+            locationtype: locationType,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         )
@@ -107,6 +147,22 @@ function AddLocation() {
                     }}
                   />
                 </ListItem>
+                <ListItem>
+                  <ComboBox
+                    {...register("LocationType", {
+                      validate: (value) => value !== "",
+                    })}
+                    value={locationType}
+                    onChange={onChangeLocationType}
+                  >
+                    <option value="">Select a Location Type</option>
+                    <option value={"0"}>Warehouse</option>
+                    <option value={"1"}>Store Location</option>
+                  </ComboBox>
+                </ListItem>
+                {errors.LocationType && (
+                  <ErrorMessage>Please select location type</ErrorMessage>
+                )}
                 <ListItem>
                   <Button
                     width="250px"

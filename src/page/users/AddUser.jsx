@@ -2,7 +2,7 @@ import { ArrowLeft, Article } from "@mui/icons-material";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Button, TextBox } from "../../components/styles/Component.styled";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useCookies } from "react-cookie";
@@ -80,6 +80,7 @@ function AddUser() {
   const [password, setPassword] = useState("");
   const [isRole, setIsRole] = useState();
   const [status, setStatus] = useState(1);
+  const { id } = useParams();
 
   const onChangeRole = (event) => {
     setIsRole(event.target.value);
@@ -96,7 +97,8 @@ function AddUser() {
             username,
             password,
             isrole: isRole,
-            status,
+            status: status,
+            locationid: id,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         )
@@ -104,7 +106,7 @@ function AddUser() {
           console.log(res);
           if (res.status === 201) {
             ToggleMessage("success", "User successfully added.");
-            navigate("/dashboard/users");
+            navigate(`/dashboard/locations/users/${id}`);
           } else {
             ToggleMessage("error", "Please contact technical support.");
           }
@@ -126,7 +128,7 @@ function AddUser() {
               <ArrowLeft
                 fontSize="small"
                 onClick={() => {
-                  navigate("/dashboard/users");
+                  navigate(`/dashboard/locations/users/${id}`);
                 }}
                 sx={{ cursor: "pointer" }}
               />
@@ -213,7 +215,7 @@ function AddUser() {
                     marginLeft="10px"
                     hoverbgColor="#697565"
                   >
-                    "Save"
+                    Save
                   </Button>
                 </ListItem>
               </List>

@@ -67,7 +67,7 @@ function AddProduct() {
     formState: { errors },
   } = useForm();
   const api = apiURL();
-
+  const [barcode, setBarcode] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [wholesalePrice, setWholesalePrice] = useState(0);
@@ -76,7 +76,7 @@ function AddProduct() {
   const [reorderLevel, setReorderLevel] = useState(0);
   const [isVat, setIsVat] = useState(1);
   const [status, setStatus] = useState(1);
-
+  const [remarks, setRemarks] = useState("");
   const [category, setCategory] = useState([]);
   const [categoryID, setCategoryID] = useState("");
 
@@ -91,6 +91,7 @@ function AddProduct() {
         .post(
           `${api}/api/products`,
           {
+            barcode: barcode,
             name: name,
             description: description,
             wholesaleprice: wholesalePrice,
@@ -99,6 +100,7 @@ function AddProduct() {
             reorderlevel: reorderLevel,
             isvat: isVat,
             status,
+            remarks,
             categoryid: categoryID,
           },
           { headers: { Authorization: `Bearer ${token}` } }
@@ -106,7 +108,7 @@ function AddProduct() {
         .then((res) => {
           console.log(res);
           if (res.status === 201) {
-            ToggleMessage("success", "Discount successfully added.");
+            ToggleMessage("success", "Product successfully added.");
             navigate("/dashboard/products");
           } else {
             ToggleMessage("error", "Please contact technical support.");
@@ -157,6 +159,10 @@ function AddProduct() {
                     fontSize="13px"
                     placeholder="Barcode"
                     required="true"
+                    {...register("Barcode")}
+                    onChange={(e) => {
+                      setBarcode(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>
@@ -253,6 +259,9 @@ function AddProduct() {
                     fontSize="13px"
                     placeholder="Remarks"
                     required="true"
+                    onChange={(e) => {
+                      setRemarks(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>

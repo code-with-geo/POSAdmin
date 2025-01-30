@@ -28,6 +28,9 @@ import CashDrawer from "./page/cash-drawer/CashDrawer";
 import AddCashDrawer from "./page/cash-drawer/AddCashDrawer";
 import EditCashDrawer from "./page/cash-drawer/EditCashDrawer";
 import Home from "./page/Home";
+import SamplePage from "./page/sample/SamplePage";
+import StockAdjustments from "./page/inventory/StockAdjustments";
+import AddAdjustment from "./page/inventory/AddAdjustment";
 
 function App() {
   return (
@@ -44,9 +47,15 @@ function App() {
             }
           >
             <Route index element={<Home />} />
-            <Route path="/dashboard/users" element={<Users />} />
-            <Route path="/dashboard/users/add" element={<AddUser />} />
-            <Route path="/dashboard/users/edit/:id" element={<EditUser />} />
+            <Route path="/dashboard/locations/users/:id" element={<Users />} />
+            <Route
+              path="/dashboard/locations/users/add/:id"
+              element={<AddUser />}
+            />
+            <Route
+              path="/dashboard/locations/users/:locationid/edit/:id"
+              element={<EditUser />}
+            />
             <Route path="/dashboard/products" element={<Products />} />
             <Route path="/dashboard/products/add" element={<AddProduct />} />
             <Route
@@ -59,8 +68,22 @@ function App() {
               path="/dashboard/category/edit/:id"
               element={<EditCategory />}
             />
-            <Route path="/dashboard/inventory" element={<Inventory />} />
-            <Route path="/dashboard/inventory/add" element={<AddInventory />} />
+            <Route
+              path="/dashboard/locations/inventory/:id"
+              element={<Inventory />}
+            />
+            <Route
+              path="/dashboard/locations/inventory/add/:id"
+              element={<AddInventory />}
+            />
+            <Route
+              path="/dashboard/locations/inventory/adjustments/:id"
+              element={<StockAdjustments />}
+            />
+            <Route
+              path="/dashboard/locations/inventory/adjustments/add/:id"
+              element={<AddAdjustment />}
+            />
             <Route
               path="/dashboard/inventory/edit"
               element={<EditInventory />}
@@ -92,6 +115,8 @@ function App() {
               path="/dashboard/cash-drawer/edit/:id"
               element={<EditCashDrawer />}
             />
+
+            <Route path="/dashboard/sample" element={<SamplePage />} />
           </Route>
         </Routes>
       </Router>

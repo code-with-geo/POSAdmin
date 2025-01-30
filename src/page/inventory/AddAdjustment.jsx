@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { useCookies } from "react-cookie";
 import { apiURL, useGetUserID } from "../../hooks/Users";
 import { ToggleMessage } from "../../libraries/SweetAlert";
-import StockInExcelModal from "./StockInExcelModal";
+import StockAdjustmentsModal from "./StockAdjustmentsModal";
 
 const Container = styled.div`
   padding: 10px;
@@ -70,7 +70,7 @@ const ErrorMessage = styled.p`
   margin-top: 5px;
 `;
 
-function AddInventory() {
+function AddAdjustment() {
   const [cookies, setCookies] = useCookies(["access_token"]);
   const token = cookies.access_token;
   const [connection, setConnection] = useState(null);
@@ -85,17 +85,16 @@ function AddInventory() {
   const { id } = useParams();
   const [products, setProducts] = useState([]);
   const [productId, setProductId] = useState("");
-  const [suppliers, setSuppliers] = useState([]);
-  const [supplierId, setSupplierId] = useState("");
   const [units, setUnits] = useState(1);
-  const [status, setStatus] = useState(1);
+  const [reason, setReason] = useState("");
+  const [action, setAction] = useState(0);
 
   const onChangeProduct = (event) => {
     setProductId(event.target.value);
   };
 
-  const onChangeSupplier = (event) => {
-    setSupplierId(event.target.value);
+  const onChangeAction = (event) => {
+    setAction(event.target.value);
   };
 
   useEffect(() => {
@@ -105,13 +104,6 @@ function AddInventory() {
       })
       .then((response) => setProducts(response.data))
       .catch((error) => console.error("Error fetching products:", error));
-
-    axios
-      .get(`${api}/api/suppliers`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => setSuppliers(response.data))
-      .catch((error) => console.error("Error fetching products:", error));
   }, [token]);
 
   const _add = (data, event) => {
@@ -119,22 +111,22 @@ function AddInventory() {
     try {
       axios
         .post(
-          `${api}/api/stock-in`,
+          `${api}/api/stock-adjustments`,
           {
-            supplierid: supplierId,
             productid: productId,
             units,
+            reason,
             userId: userID,
             locationid: id,
-            status,
+            action,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         )
         .then((res) => {
           console.log(res.status);
           if (res.status === 200) {
-            ToggleMessage("success", "Product successfully added.");
-            navigate(`/dashboard/locations/inventory/${id}`);
+            ToggleMessage("success", "Adjustment successfully added.");
+            navigate(`/dashboard/locations/inventory/adjustments/${id}`);
           } else {
             ToggleMessage(
               "error",
@@ -195,7 +187,7 @@ function AddInventory() {
 
     try {
       const response = await axios.post(
-        `${api}/api/stock-in/import`,
+        `${api}/api/stock-adjustments/import`,
         formData,
         {
           headers: {
@@ -230,11 +222,11 @@ function AddInventory() {
               <ArrowLeft
                 fontSize="small"
                 onClick={() => {
-                  navigate(`/dashboard/locations/inventory/${id}`);
+                  navigate(`/dashboard/locations/inventory/adjustments/${id}`);
                 }}
                 sx={{ cursor: "pointer" }}
               />
-              <Article fontSize="small" /> Stock In
+              <Article fontSize="small" /> Create Adjustments
             </h3>
             <Button
               color="#FFF"
@@ -247,35 +239,12 @@ function AddInventory() {
               marginRight="10px"
               onClick={openModal}
             >
-              Bulk Stock In
+              Bulk Stock Adjustments
             </Button>
           </Header>
           <Body>
             <Form onSubmit={handleSubmit(_add)}>
               <List>
-                <ListItem>
-                  <ComboBox
-                    {...register("Suppliers", {
-                      validate: (value) => value !== "",
-                    })}
-                    value={supplierId}
-                    onChange={onChangeSupplier}
-                  >
-                    <option value="">Select a Supplier</option>
-                    {suppliers != null &&
-                      suppliers.map((supplier) => (
-                        <option
-                          key={supplier.SupplierId}
-                          value={supplier.SupplierId}
-                        >
-                          {supplier.Name}
-                        </option>
-                      ))}
-                  </ComboBox>
-                </ListItem>
-                {errors.Products && (
-                  <ErrorMessage>Please select supplier</ErrorMessage>
-                )}
                 <ListItem>
                   <ComboBox
                     {...register("Products", {
@@ -303,7 +272,7 @@ function AddInventory() {
                     height="40px"
                     width="250px"
                     fontSize="13px"
-                    placeholder="Units"
+                    placeholder="Units Adjusted"
                     required="true"
                     {...register("Units")}
                     onChange={(e) => {
@@ -311,6 +280,38 @@ function AddInventory() {
                     }}
                   />
                 </ListItem>
+
+                <ListItem>
+                  <TextBox
+                    marginTop="10px"
+                    type="text"
+                    height="40px"
+                    width="250px"
+                    fontSize="13px"
+                    placeholder="Reason"
+                    required="true"
+                    {...register("Reason")}
+                    onChange={(e) => {
+                      setReason(e.target.value);
+                    }}
+                  />
+                </ListItem>
+                <ListItem>
+                  <ComboBox
+                    {...register("Action", {
+                      validate: (value) => value !== "",
+                    })}
+                    value={action}
+                    onChange={onChangeAction}
+                  >
+                    <option value="">Select a Action</option>
+                    <option value="0">Add to Inventory</option>
+                    <option value="1">Remove from Inventory</option>
+                  </ComboBox>
+                </ListItem>
+                {errors.Products && (
+                  <ErrorMessage>Please select action</ErrorMessage>
+                )}
                 <ListItem>
                   <Button
                     width="250px"
@@ -333,7 +334,7 @@ function AddInventory() {
           </Body>
         </Wrapper>
         {/* Modal Component */}
-        <StockInExcelModal
+        <StockAdjustmentsModal
           showModal={showModal}
           closeModal={closeModal}
           handleFileUpload={handleFileUpload}
@@ -345,4 +346,4 @@ function AddInventory() {
   );
 }
 
-export default AddInventory;
+export default AddAdjustment;

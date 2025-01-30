@@ -73,15 +73,17 @@ function EditProduct() {
   } = useForm();
 
   const [products, setProducts] = useState([]);
+  const [barcode, setBarcode] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [wholesalePrice, setWholesalePrice] = useState(0);
   const [retailPrice, setRetailPrice] = useState(0);
   const [supplierPrice, setSupplierPrice] = useState(0);
   const [reorderLevel, setReorderLevel] = useState(0);
-
+  const [remarks, setRemarks] = useState("");
   const [category, setCategory] = useState([]);
   const [categoryID, setCategoryID] = useState("");
+  const [status, setStatus] = useState(0);
 
   const onChangeCategory = (event) => {
     setCategoryID(event.target.value);
@@ -94,13 +96,16 @@ function EditProduct() {
         .put(
           `${api}/api/products/${id}`,
           {
+            barcode,
             name,
             description,
             wholesaleprice: wholesalePrice,
             retailprice: retailPrice,
             supplierprice: supplierPrice,
             reorderlevel: reorderLevel,
+            remarks,
             categoryid: categoryID,
+            status,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         )
@@ -147,6 +152,7 @@ function EditProduct() {
 
   useEffect(() => {
     if (products != null) {
+      setBarcode(products.Barcode);
       setName(products.Name);
       setDescription(products.Description);
       setWholesalePrice(products.WholesalePrice);
@@ -154,6 +160,8 @@ function EditProduct() {
       setSupplierPrice(products.SupplierPrice);
       setReorderLevel(products.ReorderLevel);
       setCategoryID(products.CategoryId);
+      setRemarks(products.Remarks);
+      setStatus(products.Status);
     }
   }, [products]);
 
@@ -185,6 +193,11 @@ function EditProduct() {
                     fontSize="13px"
                     placeholder="Barcode"
                     required="true"
+                    {...register("Barcode")}
+                    value={barcode}
+                    onChange={(e) => {
+                      setBarcode(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>
@@ -292,6 +305,11 @@ function EditProduct() {
                     fontSize="13px"
                     placeholder="Remarks"
                     required="true"
+                    {...register("Remarks")}
+                    value={remarks}
+                    onChange={(e) => {
+                      setRemarks(e.target.value);
+                    }}
                   />
                 </ListItem>
                 <ListItem>

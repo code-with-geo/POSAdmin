@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import DataTable from "../../components/inventory/DataTable";
+import DataTable from "../../components/inventory/stock-adjustments/DataTable";
 import { Button, PageLink } from "../../components/styles/Component.styled";
 import { ArrowLeft, Article } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
@@ -29,7 +29,7 @@ const ButtonContainer = styled.div`
   align-items: center;
 `;
 
-function Inventory() {
+function StockAdjustments() {
   const { id } = useParams();
   const navigate = useNavigate();
   return (
@@ -41,11 +41,11 @@ function Inventory() {
               <ArrowLeft
                 fontSize="small"
                 onClick={() => {
-                  navigate(`/dashboard/locations`);
+                  navigate(`/dashboard/locations/inventory/${id}`);
                 }}
                 sx={{ cursor: "pointer" }}
               />
-              <Article fontSize="small" /> Inventory
+              <Article fontSize="small" /> Stock Adjustments
             </h3>
             <ButtonContainer>
               <PageLink
@@ -56,22 +56,9 @@ function Inventory() {
                 textAlign="center"
                 borderRadius="5px"
                 hoverbgColor="#697565"
-                marginRight="10px"
-                to={`/dashboard/locations/inventory/adjustments/${id}`}
+                to={`/dashboard/locations/inventory/adjustments/add/${id}`}
               >
-                Stock Adjustments
-              </PageLink>
-              <PageLink
-                color="#FFF"
-                bgColor="#1e201e"
-                padding="8px"
-                fontSize="12px"
-                textAlign="center"
-                borderRadius="5px"
-                hoverbgColor="#697565"
-                to={`/dashboard/locations/inventory/add/${id}`}
-              >
-                Stock In
+                Create Adjustment
               </PageLink>
             </ButtonContainer>
           </Header>
@@ -84,4 +71,4 @@ function Inventory() {
   );
 }
 
-export default Inventory;
+export default StockAdjustments;

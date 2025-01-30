@@ -66,7 +66,7 @@ function EditUser() {
 
   const api = apiURL();
   const [connection, setConnection] = useState(null);
-  const { id } = useParams();
+  const { id, locationid } = useParams();
   const {
     register,
     handleSubmit,
@@ -101,7 +101,7 @@ function EditUser() {
           console.log(res);
           if (res.status === 204) {
             ToggleMessage("success", "User successfully updated.");
-            navigate("/dashboard/users");
+            navigate(`/dashboard/locations/users/${locationid}`);
           } else if (res.status === 402) {
           } else {
             ToggleMessage("error", "Please contact technical support.");
@@ -146,7 +146,7 @@ function EditUser() {
               <ArrowLeft
                 fontSize="small"
                 onClick={() => {
-                  navigate("/dashboard/users");
+                  navigate(`/dashboard/locations/users/${locationid}`);
                 }}
                 sx={{ cursor: "pointer" }}
               />

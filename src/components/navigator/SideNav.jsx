@@ -143,13 +143,6 @@ const SideNav = () => {
             >
               <Dashboard fontSize="small" /> Home
             </DrawerItem>
-            <DrawerItem
-              to="/dashboard/users"
-              onClick={toggleDrawer}
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              <AccountCircle fontSize="small" /> Users
-            </DrawerItem>
             {/* <DrawerItem
               to="/contact"
               onClick={toggleDrawer}
@@ -177,13 +170,6 @@ const SideNav = () => {
               className={({ isActive }) => (isActive ? "active" : "")}
             >
               <Category fontSize="small" /> Categories
-            </DrawerItem>
-            <DrawerItem
-              to="/dashboard/inventory"
-              onClick={toggleDrawer}
-              className={({ isActive }) => (isActive ? "active" : "")}
-            >
-              <Inventory fontSize="small" /> Inventory
             </DrawerItem>
             <DrawerItem
               to="/dashboard/locations"
