@@ -31,6 +31,7 @@ import Home from "./page/Home";
 import SamplePage from "./page/sample/SamplePage";
 import StockAdjustments from "./page/inventory/StockAdjustments";
 import AddAdjustment from "./page/inventory/AddAdjustment";
+import Delivery from "./page/delivery/Delivery";
 
 function App() {
   return (
@@ -38,6 +39,14 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route
+            path="/delivery"
+            element={
+              <ProtectedRoute>
+                <Delivery />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={

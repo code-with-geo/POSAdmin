@@ -43,7 +43,7 @@ function Login() {
             setCookies("access_token", res.data.Token);
             window.localStorage.setItem("UserID", res.data.UserId);
             window.localStorage.setItem("LocationId", res.data.LocationId);
-            navigate("/dashboard/");
+            navigate("/delivery");
           } else if (res.status === 401) {
             ToggleMessage("error", "Incorrect username or password.");
           } else {
